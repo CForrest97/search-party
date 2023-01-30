@@ -63,15 +63,15 @@ describe("ForensicsInstructionsRepository", () => {
   });
 
   it("should handle unexpected responses from the forensics api", async () => {
-    const { getInstructions } = arrangeTest(
-      "this is not an expected response" as any
-    );
+    const { getInstructions } = arrangeTest({
+        thisIs: "an unexpected response from the forensics API",
+      } as any);
 
     const error = await getInstructions();
 
     expect(error).toBeInstanceOf(InstructionsRepositoryError);
     expect((error as InstructionsRepositoryError).message).toEqual(
-      "unexpected response: this is not an expected response"
+      'unexpected json response: {"thisIs":"an unexpected response from the forensics API"}'
     );
   });
 

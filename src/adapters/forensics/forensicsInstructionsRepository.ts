@@ -58,7 +58,7 @@ export class ForensicsInstructionsRepository implements InstructionsRepository {
       }
 
       return new InstructionsRepositoryError(
-        `unexpected response: ${response}`,
+        `unexpected json response: ${JSON.stringify(response)}`,
         this.logger
       );
     } catch (error) {
