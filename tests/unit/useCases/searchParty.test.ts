@@ -10,6 +10,7 @@ import {
 } from "../../../src/ports/positionInvestigator";
 import ResolvedValue = jest.ResolvedValue;
 import { silentLogger } from "../../helpers/silentLogger";
+import { Position } from "../../../src/domain/position";
 
 const arrangeTest = (
   instructions: ResolvedValue<
@@ -17,7 +18,7 @@ const arrangeTest = (
   >,
   investigationMessage: ResolvedValue<
     ReturnType<PositionInvestigator["investigatePosition"]>
-  > = ""
+  > = "mocked investigation message response"
 ) => {
   const instructionsRepository = mock<InstructionsRepository>();
   const positionInvestigator = mock<PositionInvestigator>();
@@ -32,16 +33,21 @@ const arrangeTest = (
     positionInvestigator
   );
 
+  const assertPositionInvestigatedAt = (position: Position) =>
+    expect(positionInvestigator.investigatePosition).toHaveBeenCalledWith(
+      position
+    );
+
   return {
     locateKittens: () => searchParty.locateKittens(),
-    positionInvestigator,
+    assertPositionInvestigatedAt,
   };
 };
 
 describe("SearchParty", () => {
   describe("given the kittens are at the starting location", () => {
     it("should find the kittens at [0.0]", async () => {
-      const { locateKittens, positionInvestigator } = arrangeTest(
+      const { locateKittens, assertPositionInvestigatedAt } = arrangeTest(
         [],
         "investigation response message"
       );
@@ -49,7 +55,7 @@ describe("SearchParty", () => {
       const kittensPosition = await locateKittens();
 
       expect(kittensPosition).toEqual("investigation response message");
-      expect(positionInvestigator.investigatePosition).toHaveBeenCalledWith({
+      assertPositionInvestigatedAt({
         x: 0,
         y: 0,
       });
@@ -66,14 +72,12 @@ describe("SearchParty", () => {
     `(
       "should find the kittens after moving $instructions",
       async ({ instructions, expectedPosition }) => {
-        const { locateKittens, positionInvestigator } =
+        const { locateKittens, assertPositionInvestigatedAt } =
           arrangeTest(instructions);
 
         await locateKittens();
 
-        expect(positionInvestigator.investigatePosition).toHaveBeenCalledWith(
-          expectedPosition
-        );
+        assertPositionInvestigatedAt(expectedPosition);
       }
     );
   });
@@ -89,14 +93,12 @@ describe("SearchParty", () => {
     `(
       "should find the kittens after moving $instructions",
       async ({ instructions, expectedPosition }) => {
-        const { locateKittens, positionInvestigator } =
+        const { locateKittens, assertPositionInvestigatedAt } =
           arrangeTest(instructions);
 
         await locateKittens();
 
-        expect(positionInvestigator.investigatePosition).toHaveBeenCalledWith(
-          expectedPosition
-        );
+        assertPositionInvestigatedAt(expectedPosition);
       }
     );
   });
@@ -112,14 +114,12 @@ describe("SearchParty", () => {
     `(
       "should find the kittens after moving $instructions",
       async ({ instructions, expectedPosition }) => {
-        const { locateKittens, positionInvestigator } =
+        const { locateKittens, assertPositionInvestigatedAt } =
           arrangeTest(instructions);
 
         await locateKittens();
 
-        expect(positionInvestigator.investigatePosition).toHaveBeenCalledWith(
-          expectedPosition
-        );
+        assertPositionInvestigatedAt(expectedPosition);
       }
     );
   });
@@ -148,8 +148,8 @@ describe("SearchParty", () => {
     expect(kittensPosition).toEqual(error);
   });
 
-  it("should navigate the kittens along a complex path", async () => {
-    const { locateKittens, positionInvestigator } = arrangeTest([
+  it("should navigate along a complex path", async () => {
+    const { locateKittens, assertPositionInvestigatedAt } = arrangeTest([
       "FORWARD",
       "RIGHT",
       "FORWARD",
@@ -172,7 +172,7 @@ describe("SearchParty", () => {
 
     await locateKittens();
 
-    expect(positionInvestigator.investigatePosition).toHaveBeenCalledWith({
+    assertPositionInvestigatedAt({
       x: 5,
       y: 2,
     });
