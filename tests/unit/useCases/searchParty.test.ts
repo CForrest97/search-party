@@ -46,7 +46,7 @@ const arrangeTest = (
 
 describe("SearchParty", () => {
   describe("given the kittens are at the starting location", () => {
-    it("should find the kittens at [0.0]", async () => {
+    it("should find the kittens at (x=0, y=0)", async () => {
       const { locateKittens, assertPositionInvestigatedAt } = arrangeTest(
         [],
         "investigation response message"

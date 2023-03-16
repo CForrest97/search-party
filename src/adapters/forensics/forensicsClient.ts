@@ -4,7 +4,7 @@ import { Logger } from "loglevel";
 export class ForensicsClient {
   constructor(private email: string, private logger: Logger) {}
 
-  public async get(path: string) {
+  public async get(path: string): Promise<unknown> {
     const url = `https://which-technical-exercise.herokuapp.com/api/${this.email}/${path}`;
     this.logger.info(`making request at ${url}`);
 

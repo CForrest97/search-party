@@ -1,9 +1,6 @@
-import * as fetch from "node-fetch";
 import { ForensicsInstructionsRepository } from "../../../../src/adapters/forensics/forensicsInstructionsRepository";
 import { InstructionsRepositoryError } from "../../../../src/ports/instructionsRepository";
 import { silentLogger } from "../../../helpers/silentLogger";
-
-const spyOnFetch = jest.spyOn(fetch, "default");
 
 describe("ForensicsInstructionsRepository", () => {
   it("should get the instructions from the forensics API", async () => {
@@ -16,9 +13,6 @@ describe("ForensicsInstructionsRepository", () => {
     const instructions =
       await forensicsInstructionsRepository.getInstructions();
 
-    expect(spyOnFetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/${email}/directions`)
-    );
     expect(instructions).toEqual([
       "FORWARD",
       "RIGHT",

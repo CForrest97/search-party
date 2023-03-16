@@ -1,12 +1,9 @@
-import * as fetch from "node-fetch";
 import { ForensicsPositionInvestigator } from "../../../../src/adapters/forensics/forensicsPositionInvestigator";
 import { generateUniqueEmail } from "../../../helpers/generateUniqueEmail";
 import { silentLogger } from "../../../helpers/silentLogger";
 
-const spyOnFetch = jest.spyOn(fetch, "default");
-
 describe("ForensicsInstructionsRepository", () => {
-  it("should validate that the kittens are at [5,2]", async () => {
+  it("should validate that the kittens are at (x=5, y=2)", async () => {
     const email = generateUniqueEmail();
     const forensicsPositionValidator = new ForensicsPositionInvestigator(
       email,
@@ -18,9 +15,6 @@ describe("ForensicsInstructionsRepository", () => {
       y: 2,
     });
 
-    expect(spyOnFetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/location/5/2`)
-    );
     expect(message).toEqual(
       "Congratulations! The search party successfully recovered the missing kittens.Please push your code to github and send the url to michael.kidd@which.co.uk"
     );

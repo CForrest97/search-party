@@ -6,9 +6,11 @@ import {
   InstructionsRepositoryError,
 } from "../../ports/instructionsRepository";
 import { ForensicsClient } from "./forensicsClient";
+import { isSchema } from "../../utils/isSchema";
 
+const directions = ["forward", "left", "right"] as const;
 const successResponseSchema = z.object({
-  directions: z.array(z.enum(["forward", "left", "right"])),
+  directions: z.array(z.enum(directions)),
 });
 
 const failureResponseSchema = z.object({
@@ -17,17 +19,18 @@ const failureResponseSchema = z.object({
 
 export type SuccessResponse = z.infer<typeof successResponseSchema>;
 export type FailureResponse = z.infer<typeof failureResponseSchema>;
-type Direction = SuccessResponse["directions"][0];
 
-const isSuccessfulResponse = (
-  jsonResponse: unknown
-): jsonResponse is SuccessResponse =>
-  successResponseSchema.safeParse(jsonResponse).success;
+const isSuccessfulResponse = isSchema(successResponseSchema);
+const isFailureResponse = isSchema(failureResponseSchema);
 
-const isFailureResponse = (
-  jsonResponse: unknown
-): jsonResponse is FailureResponse =>
-  failureResponseSchema.safeParse(jsonResponse).success;
+const mapDirectionToInstruction: Record<
+  (typeof directions)[number],
+  Instruction
+> = {
+  forward: "FORWARD",
+  right: "RIGHT",
+  left: "LEFT",
+};
 
 export class ForensicsInstructionsRepository implements InstructionsRepository {
   private forensicsClient;
@@ -36,20 +39,13 @@ export class ForensicsInstructionsRepository implements InstructionsRepository {
     this.forensicsClient = new ForensicsClient(email, logger);
   }
 
-  private static mapDirectionToInstruction: Record<Direction, Instruction> = {
-    forward: "FORWARD",
-    right: "RIGHT",
-    left: "LEFT",
-  };
-
   public async getInstructions() {
     try {
-      const response = await this.forensicsClient.get(`directions`);
+      const response = await this.forensicsClient.get("directions");
 
       if (isSuccessfulResponse(response)) {
         return response.directions.map(
-          (direction) =>
-            ForensicsInstructionsRepository.mapDirectionToInstruction[direction]
+          (direction) => mapDirectionToInstruction[direction]
         );
       }
 

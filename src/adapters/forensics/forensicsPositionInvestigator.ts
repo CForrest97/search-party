@@ -6,6 +6,7 @@ import {
 } from "../../ports/positionInvestigator";
 import { Position } from "../../domain/position";
 import { ForensicsClient } from "./forensicsClient";
+import { isSchema } from "../../utils/isSchema";
 
 const successResponseSchema = z.object({
   message: z.string(),
@@ -18,15 +19,8 @@ const failureResponseSchema = z.object({
 export type SuccessResponse = z.infer<typeof successResponseSchema>;
 export type FailureResponse = z.infer<typeof failureResponseSchema>;
 
-const isSuccessfulResponse = (
-  jsonResponse: unknown
-): jsonResponse is SuccessResponse =>
-  successResponseSchema.safeParse(jsonResponse).success;
-
-const isFailureResponse = (
-  jsonResponse: unknown
-): jsonResponse is FailureResponse =>
-  failureResponseSchema.safeParse(jsonResponse).success;
+const isSuccessfulResponse = isSchema(successResponseSchema);
+const isFailureResponse = isSchema(failureResponseSchema);
 
 export class ForensicsPositionInvestigator implements PositionInvestigator {
   private forensicsClient;
